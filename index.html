@@ -452,16 +452,16 @@
                     {gameState === 'quiz' && (
                     <div className="px-6 pb-6 pt-0 sm:px-8 sm:pb-8 sm:pt-0">
                         {/* Progress Bar */}
-                        <div className="bg-slate-100 h-2 mb-8 -mx-6 sm:-mx-8 w-[calc(100%+3rem)] sm:w-[calc(100%+4rem)] relative">
+                        <div className="bg-slate-100 h-3 mb-8 -mx-6 sm:-mx-8 w-[calc(100%+3rem)] sm:w-[calc(100%+4rem)] relative">
                         <div 
-                            className="h-2 transition-all duration-300 animate-progress-sheen"
+                            className="h-3 transition-all duration-300 animate-progress-sheen"
                             style={{ width: `${progressPercent}%` }}
                         ></div>
                         <div
-                            className="absolute -top-5 text-lg animate-turtle-wiggle transition-[left] duration-300"
-                            style={{ left: `calc(${progressPercent}% - 0.5rem)`, paddingTop: "4px" }}
+                            className="absolute text-lg transition-[left] duration-300"
+                            style={{ left: `calc(${progressPercent}% - 0.5rem + 2px)`, top: "50%", transform: "translateY(calc(-50% - 3px)) scaleX(-1)" }}
                         >
-                            🐢
+                            <span className="inline-block animate-turtle-wiggle">🐢</span>
                         </div>
                         </div>
 
