@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Turtle Quiz</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel für JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        /* Custom animations not in Tailwind default */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        @keyframes bounce-custom {
+            0%, 100% { transform: translateY(-5px); }
+            50% { transform: translateY(5px); }
+        }
+        .animate-bounce-custom {
+            animation: bounce-custom 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4">
+
+    <div id="root" class="w-full max-w-2xl"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // --- Icons Components ---
+        const Icon = ({ children, className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                {children}
+            </svg>
+        );
+
+        const Play = ({ className }) => <Icon className={className}><polygon points="5 3 19 12 5 21 5 3"></polygon></Icon>;
+        const RotateCcw = ({ className }) => <Icon className={className}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 12"></path><path d="M3 3v9h9"></path></Icon>;
+        const CheckCircle = ({ className }) => <Icon className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></Icon>;
+        const XCircle = ({ className }) => <Icon className={className}><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></Icon>;
+        const ChevronRight = ({ className }) => <Icon className={className}><polyline points="9 18 15 12 9 6"></polyline></Icon>;
+        const Code = ({ className }) => <Icon className={className}><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></Icon>;
+        const HelpCircle = ({ className }) => <Icon className={className}><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></Icon>;
+        const Trophy = ({ className }) => <Icon className={className}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17"></path><path d="M14 14.66V17"></path><path d="M18 2h-4a4 4 0 0 0-4 4v3a8 8 0 0 0 8 8h0a8 8 0 0 0 8-8V6a4 4 0 0 0-4-4Z" transform="translate(-2)"></path><path d="M6 6v3a6 6 0 0 0 12 0V6"></path></Icon>;
+        const Star = ({ className }) => <Icon className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></Icon>;
+
+        // --- Data ---
+        const quizSets = {
+            set1: {
+                title: "Set 1: Grundlagen",
+                description: "Bewegung, Drehungen und die Basics.",
+                questions: [
+                    {
+                        questionText: "Welcher Befehl wird benötigt, um das Turtle-Modul in Python zu verwenden?",
+                        codeSnippet: "# Am Anfang des Skripts",
+                        answerOptions: [
+                        { answerText: "include turtle", isCorrect: false },
+                        { answerText: "import turtle", isCorrect: true },
+                        { answerText: "use turtle", isCorrect: false },
+                        { answerText: "from turtle get *", isCorrect: false },
+                        ],
+                        explanation: "In Python verwendet man das Schlüsselwort 'import', um Module wie turtle zu laden."
+                    },
+                    {
+                        questionText: "Wie bewegt man die Turtle 100 Pixel vorwärts?",
+                        answerOptions: [
+                        { answerText: "move(100)", isCorrect: false },
+                        { answerText: "go(100)", isCorrect: false },
+                        { answerText: "forward(100)", isCorrect: true },
+                        { answerText: "walk(100)", isCorrect: false },
+                        ],
+                        explanation: "Die Funktion 'forward()' (oder kurz 'fd()') bewegt die Turtle in Blickrichtung."
+                    },
+                    {
+                        questionText: "Was bewirkt der folgende Code?",
+                        codeSnippet: "right(90)",
+                        answerOptions: [
+                        { answerText: "Bewegt die Turtle 90 Pixel nach rechts", isCorrect: false },
+                        { answerText: "Dreht die Turtle um 90 Grad nach rechts", isCorrect: true },
+                        { answerText: "Setzt die Position auf X=90", isCorrect: false },
+                        { answerText: "Zeichnet einen rechten Winkel", isCorrect: false },
+                        ],
+                        explanation: "'right(x)' und 'left(x)' drehen die Turtle um x Grad, ohne sie zu bewegen."
+                    },
+                    {
+                        questionText: "Wie hebt man den Stift an, damit die Turtle sich bewegt, ohne zu zeichnen?",
+                        answerOptions: [
+                        { answerText: "penup()", isCorrect: true },
+                        { answerText: "stopwriting()", isCorrect: false },
+                        { answerText: "lift()", isCorrect: false },
+                        { answerText: "nopen()", isCorrect: false },
+                        ],
+                        explanation: "'penup()' (oder 'pu()') hebt den Stift an. 'pendown()' (oder 'pd()') setzt ihn wieder ab."
+                    },
+                    {
+                        questionText: "Welche Form zeichnet dieser Loop?",
+                        codeSnippet: "for i in range(4):\n    forward(100)\n    left(90)",
+                        answerOptions: [
+                        { answerText: "Ein Dreieck", isCorrect: false },
+                        { answerText: "Einen Kreis", isCorrect: false },
+                        { answerText: "Ein Quadrat", isCorrect: true },
+                        { answerText: "Eine Linie", isCorrect: false },
+                        ],
+                        explanation: "4 Wiederholungen von 'Vorwärts laufen' und '90 Grad drehen' ergeben ein Quadrat."
+                    },
+                    {
+                        questionText: "Wie änderst du die Farbe der Linie auf Rot?",
+                        answerOptions: [
+                        { answerText: "paint('red')", isCorrect: false },
+                        { answerText: "color('red')", isCorrect: true },
+                        { answerText: "line('red')", isCorrect: false },
+                        { answerText: "style(color='red')", isCorrect: false },
+                        ],
+                        explanation: "'color()' oder 'pencolor()' setzt die Zeichenfarbe."
+                    },
+                    {
+                        questionText: "Was macht 'reset()'?",
+                        answerOptions: [
+                        { answerText: "Beendet das Programm", isCorrect: false },
+                        { answerText: "Löscht die Zeichnung, behält aber die Position bei", isCorrect: false },
+                        { answerText: "Löscht alles und setzt die Turtle in die Mitte zurück", isCorrect: true },
+                        { answerText: "Startet den Computer neu", isCorrect: false },
+                        ],
+                        explanation: "'reset()' löscht die Leinwand und bringt die Turtle zurück zum Start (0,0). 'clear()' löscht nur die Zeichnung."
+                    },
+                    {
+                        questionText: "Wie ändert man die Geschwindigkeit der Turtle auf das Maximum?",
+                        answerOptions: [
+                        { answerText: "speed(100)", isCorrect: false },
+                        { answerText: "speed(0)", isCorrect: true },
+                        { answerText: "speed('fastest')", isCorrect: false },
+                        { answerText: "Sowohl 0 als auch 'fastest'", isCorrect: false }, 
+                        ],
+                        explanation: "In Turtle Python ist 'speed(0)' die schnellste Einstellung (keine Animation), gefolgt von 10 (schnell)."
+                    },
+                    {
+                        questionText: "Wie ändert man die Hintergrundfarbe des Fensters?",
+                        answerOptions: [
+                        { answerText: "background('black')", isCorrect: false },
+                        { answerText: "bgcolor('black')", isCorrect: true },
+                        { answerText: "window('black')", isCorrect: false },
+                        { answerText: "screen('black')", isCorrect: false },
+                        ],
+                        explanation: "'bgcolor()' ändert die Farbe des gesamten Zeichenbereichs (Hintergrund)."
+                    },
+                    {
+                        questionText: "Wie zeichnet man einen Kreis mit Radius 50?",
+                        answerOptions: [
+                        { answerText: "round(50)", isCorrect: false },
+                        { answerText: "circle(50)", isCorrect: true },
+                        { answerText: "loop(50)", isCorrect: false },
+                        { answerText: "arc(360, 50)", isCorrect: false },
+                        ],
+                        explanation: "Die Funktion 'circle(radius)' zeichnet einen Kreis vom aktuellen Punkt aus."
+                    }
+                ],
+                summaryPoints: [
+                    "Import: import turtle",
+                    "Bewegung: forward(), left(), right()",
+                    "Stift: penup(), pendown()",
+                    "Loops: for i in range(4): (Quadrat)"
+                ]
+            },
+            set2: {
+                title: "Set 2: Fortgeschritten",
+                description: "Füllungen, Dicke, Position und Text.",
+                questions: [
+                    {
+                        questionText: "Welche Befehle braucht man, um eine Form farbig zu füllen?",
+                        codeSnippet: "___()\ncircle(50)\n___()",
+                        answerOptions: [
+                        { answerText: "start_fill() und stop_fill()", isCorrect: false },
+                        { answerText: "begin_fill() und end_fill()", isCorrect: true },
+                        { answerText: "fill_on() und fill_off()", isCorrect: false },
+                        { answerText: "color_start() und color_end()", isCorrect: false },
+                        ],
+                        explanation: "Man startet mit 'begin_fill()', zeichnet die geschlossene Form und beendet mit 'end_fill()'."
+                    },
+                    {
+                        questionText: "Wie ändert man die Dicke des Stifts auf 5 Pixel?",
+                        answerOptions: [
+                        { answerText: "pensize(5) oder width(5)", isCorrect: true },
+                        { answerText: "thickness(5)", isCorrect: false },
+                        { answerText: "pen_width(5)", isCorrect: false },
+                        { answerText: "size(5)", isCorrect: false },
+                        ],
+                        explanation: "'pensize()' oder 'width()' steuern die Strichstärke der Turtle."
+                    },
+                    {
+                        questionText: "Wie bewegt man die Turtle zu einer absoluten Koordinate (x=100, y=200)?",
+                        answerOptions: [
+                        { answerText: "move_to(100, 200)", isCorrect: false },
+                        { answerText: "position(100, 200)", isCorrect: false },
+                        { answerText: "goto(100, 200)", isCorrect: true },
+                        { answerText: "jump(100, 200)", isCorrect: false },
+                        ],
+                        explanation: "'goto(x, y)' (oder 'setpos()') bewegt die Turtle direkt zu den angegebenen Koordinaten."
+                    },
+                    {
+                        questionText: "Wie lässt man die Turtle 'unsichtbar' werden, damit man nur die Zeichnung sieht?",
+                        answerOptions: [
+                        { answerText: "invisible()", isCorrect: false },
+                        { answerText: "hide()", isCorrect: false },
+                        { answerText: "hideturtle()", isCorrect: true },
+                        { answerText: "cloak()", isCorrect: false },
+                        ],
+                        explanation: "'hideturtle()' (oder 'ht()') versteckt das Dreieck/die Schildkröte. 'showturtle()' zeigt sie wieder."
+                    },
+                    {
+                        questionText: "Was macht 'setheading(90)'?",
+                        answerOptions: [
+                        { answerText: "Setzt die Position auf Y=90", isCorrect: false },
+                        { answerText: "Dreht die Turtle so, dass sie nach Norden (oben) schaut", isCorrect: true },
+                        { answerText: "Dreht die Turtle um 90 Grad weiter", isCorrect: false },
+                        { answerText: "Setzt die Kopfgröße auf 90", isCorrect: false },
+                        ],
+                        explanation: "'setheading()' setzt den absoluten Winkel. 0=Ost, 90=Nord, 180=West, 270=Süd."
+                    },
+                    {
+                        questionText: "Wie läuft die Turtle rückwärts?",
+                        answerOptions: [
+                        { answerText: "reverse()", isCorrect: false },
+                        { answerText: "backward()", isCorrect: true },
+                        { answerText: "backstep()", isCorrect: false },
+                        { answerText: "return()", isCorrect: false },
+                        ],
+                        explanation: "'backward()' (oder 'bk()') bewegt die Turtle entgegen ihrer Blickrichtung."
+                    },
+                    {
+                        questionText: "Was passiert bei 'home()'?",
+                        answerOptions: [
+                        { answerText: "Das Programm wird beendet", isCorrect: false },
+                        { answerText: "Die Turtle geht zu (0,0) und blickt nach Osten", isCorrect: true },
+                        { answerText: "Die Turtle geht zu (0,0), behält aber ihren Winkel", isCorrect: false },
+                        { answerText: "Es wird ein Haus gezeichnet", isCorrect: false },
+                        ],
+                        explanation: "'home()' setzt die Turtle auf den Ursprung (0,0) und den Winkel auf 0 (Rechts/Ost) zurück."
+                    },
+                    {
+                        questionText: "Wie hinterlässt man einen statischen Abdruck der Turtle auf der Leinwand?",
+                        answerOptions: [
+                        { answerText: "print()", isCorrect: false },
+                        { answerText: "copy()", isCorrect: false },
+                        { answerText: "stamp()", isCorrect: true },
+                        { answerText: "clone()", isCorrect: false },
+                        ],
+                        explanation: "'stamp()' erstellt einen Abdruck der aktuellen Turtle-Form an der aktuellen Position."
+                    },
+                    {
+                        questionText: "Wie schreibt man Text auf die Leinwand?",
+                        codeSnippet: "___('Hallo Welt')",
+                        answerOptions: [
+                        { answerText: "text()", isCorrect: false },
+                        { answerText: "draw_text()", isCorrect: false },
+                        { answerText: "label()", isCorrect: false },
+                        { answerText: "write()", isCorrect: true },
+                        ],
+                        explanation: "Mit 'write()' kann man Strings an der Position der Turtle schreiben."
+                    },
+                    {
+                        questionText: "Was passiert bei folgendem Befehl?",
+                        codeSnippet: "forward(-100)",
+                        answerOptions: [
+                        { answerText: "Es gibt eine Fehlermeldung", isCorrect: false },
+                        { answerText: "Die Turtle läuft 100 Pixel rückwärts", isCorrect: true },
+                        { answerText: "Die Turtle dreht sich um 100 Grad", isCorrect: false },
+                        { answerText: "Nichts, negative Zahlen sind verboten", isCorrect: false },
+                        ],
+                        explanation: "Negative Werte bei 'forward()' bewirken das Gegenteil: Die Turtle läuft rückwärts. Das ist dasselbe wie 'backward(100)'."
+                    }
+                ],
+                summaryPoints: [
+                    "Füllung: begin_fill() ... end_fill()",
+                    "Dicke & Tricks: pensize(), forward(-x)",
+                    "Navigation: goto(), home(), setheading()",
+                    "Extras: stamp(), write(), hideturtle()"
+                ]
+            }
+        };
+
+        // --- Main App Component ---
+        function TurtleQuiz() {
+            const [gameState, setGameState] = useState('start'); // start, quiz, result
+            const [activeSetKey, setActiveSetKey] = useState(null);
+            const [currentQuestion, setCurrentQuestion] = useState(0);
+            const [showFeedback, setShowFeedback] = useState(false);
+            const [score, setScore] = useState(0);
+            const [selectedAnswer, setSelectedAnswer] = useState(null);
+            const [isCorrect, setIsCorrect] = useState(null);
+
+            // Helper to get current questions
+            const questions = activeSetKey ? quizSets[activeSetKey].questions : [];
+
+            const handleStartSet = (setKey) => {
+                setActiveSetKey(setKey);
+                setGameState('quiz');
+                setCurrentQuestion(0);
+                setScore(0);
+                setShowFeedback(false);
+            };
+
+            const handleRestart = () => {
+                setGameState('start');
+                setActiveSetKey(null);
+                setCurrentQuestion(0);
+                setScore(0);
+                setShowFeedback(false);
+            };
+
+            const handleAnswerClick = (isCorrectAnswer, index) => {
+                if (showFeedback) return; // Prevent double clicking
+
+                setSelectedAnswer(index);
+                setIsCorrect(isCorrectAnswer);
+                setShowFeedback(true);
+
+                if (isCorrectAnswer) {
+                    setScore(score + 1);
+                }
+            };
+
+            const handleNextQuestion = () => {
+                const nextQuestion = currentQuestion + 1;
+                if (nextQuestion < questions.length) {
+                    setCurrentQuestion(nextQuestion);
+                    setShowFeedback(false);
+                    setSelectedAnswer(null);
+                    setIsCorrect(null);
+                } else {
+                    setGameState('result');
+                }
+            };
+
+            const getScoreMessage = () => {
+                const percentage = (score / questions.length) * 100;
+                if (percentage === 100) return "Perfekt! Du bist ein Turtle-Meister! 🐢👑";
+                if (percentage >= 80) return "Super gemacht! 🐢🔥";
+                if (percentage >= 50) return "Gut! Du hast die Grundlagen drauf. 🐢👍";
+                return "Übung macht den Meister. 🐢📚";
+            };
+
+            return (
+                <div className="w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
+                    
+                    {/* Header */}
+                    <div className="bg-emerald-600 p-6 text-white flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                        <Code className="w-8 h-8" />
+                        <h1 className="text-2xl font-bold">Python Turtle Quiz</h1>
+                    </div>
+                    {gameState === 'quiz' && (
+                        <div className="text-sm font-medium bg-emerald-700 px-3 py-1 rounded-full">
+                        {quizSets[activeSetKey].title} • {currentQuestion + 1} / {questions.length}
+                        </div>
+                    )}
+                    </div>
+
+                    {/* Start Screen (Set Selection) */}
+                    {gameState === 'start' && (
+                    <div className="p-8 text-center space-y-6">
+                        <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto text-emerald-600">
+                            <HelpCircle className="w-12 h-12" />
+                        </div>
+                        <div>
+                            <h2 className="text-2xl font-bold mb-2">Wähle dein Level</h2>
+                            <p className="text-slate-600">
+                                Teste dein Wissen über Python Turtle Graphics.
+                            </p>
+                        </div>
+                        
+                        <div className="grid gap-4 sm:grid-cols-2 mt-4">
+                            {Object.entries(quizSets).map(([key, set]) => (
+                                <button 
+                                    key={key}
+                                    onClick={() => handleStartSet(key)}
+                                    className="flex flex-col items-center justify-center p-6 border-2 border-slate-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50 transition-all group text-left"
+                                >
+                                    <div className="bg-emerald-100 p-3 rounded-full mb-3 group-hover:bg-emerald-200 transition-colors">
+                                        {key === 'set1' ? <Play className="w-6 h-6 text-emerald-700" /> : <Star className="w-6 h-6 text-emerald-700" />}
+                                    </div>
+                                    <h3 className="font-bold text-lg text-slate-800">{set.title}</h3>
+                                    <p className="text-sm text-slate-500 mt-1">{set.description}</p>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    )}
+
+                    {/* Quiz Screen */}
+                    {gameState === 'quiz' && (
+                    <div className="p-6 sm:p-8">
+                        {/* Progress Bar */}
+                        <div className="w-full bg-slate-100 rounded-full h-2 mb-8">
+                        <div 
+                            className="bg-emerald-500 h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${((currentQuestion) / questions.length) * 100}%` }}
+                        ></div>
+                        </div>
+
+                        <h2 className="text-xl font-bold mb-4">
+                        {questions[currentQuestion].questionText}
+                        </h2>
+
+                        {/* Code Snippet if available */}
+                        {questions[currentQuestion].codeSnippet && (
+                        <div className="bg-slate-800 text-emerald-400 p-4 rounded-lg font-mono text-sm mb-6 border-l-4 border-emerald-500 shadow-sm overflow-x-auto">
+                            <pre>{questions[currentQuestion].codeSnippet}</pre>
+                        </div>
+                        )}
+
+                        {/* Answer Options */}
+                        <div className="space-y-3">
+                        {questions[currentQuestion].answerOptions.map((option, index) => {
+                            let buttonClass = "w-full p-4 text-left rounded-lg border-2 transition-all duration-200 flex items-center justify-between group ";
+                            
+                            if (showFeedback) {
+                            if (option.isCorrect) {
+                                buttonClass += "border-emerald-500 bg-emerald-50 text-emerald-800";
+                            } else if (selectedAnswer === index) {
+                                buttonClass += "border-red-500 bg-red-50 text-red-800";
+                            } else {
+                                buttonClass += "border-slate-100 text-slate-400 opacity-60";
+                            }
+                            } else {
+                            buttonClass += "border-slate-200 hover:border-emerald-400 hover:bg-emerald-50 text-slate-700";
+                            }
+
+                            return (
+                            <button
+                                key={index}
+                                onClick={() => handleAnswerClick(option.isCorrect, index)}
+                                disabled={showFeedback}
+                                className={buttonClass}
+                            >
+                                <span className="font-medium">{option.answerText}</span>
+                                {showFeedback && option.isCorrect && <CheckCircle className="w-5 h-5 text-emerald-600" />}
+                                {showFeedback && selectedAnswer === index && !option.isCorrect && <XCircle className="w-5 h-5 text-red-600" />}
+                            </button>
+                            );
+                        })}
+                        </div>
+
+                        {/* Feedback Area */}
+                        <div className="mt-8">
+                            {showFeedback && (
+                            <div className={`animate-fade-in p-4 rounded-lg mb-4 border ${isCorrect ? 'bg-emerald-50 border-emerald-200' : 'bg-red-50 border-red-200'}`}>
+                                <h3 className={`font-bold flex items-center gap-2 ${isCorrect ? 'text-emerald-800' : 'text-red-800'}`}>
+                                    {isCorrect ? (
+                                    <>
+                                        <CheckCircle className="w-5 h-5" /> Richtig!
+                                    </>
+                                    ) : (
+                                    <>
+                                        <XCircle className="w-5 h-5" /> Leider falsch.
+                                    </>
+                                    )}
+                                </h3>
+                                <p className="mt-2 text-slate-700">
+                                    {questions[currentQuestion].explanation}
+                                </p>
+                            </div>
+                            )}
+
+                            <button
+                                onClick={handleNextQuestion}
+                                disabled={!showFeedback}
+                                className={`w-full py-3 font-bold rounded-lg transition-colors flex items-center justify-center gap-2 ${
+                                    showFeedback 
+                                    ? "bg-slate-800 hover:bg-slate-900 text-white" 
+                                    : "bg-slate-200 text-slate-400 cursor-not-allowed"
+                                }`}
+                            >
+                                {currentQuestion === questions.length - 1 ? "Ergebnis ansehen" : "Nächste Frage"}
+                                <ChevronRight className="w-5 h-5" />
+                            </button>
+                        </div>
+                    </div>
+                    )}
+
+                    {/* Result Screen */}
+                    {gameState === 'result' && (
+                    <div className="p-8 text-center space-y-8 animate-fade-in">
+                        <div className="relative inline-block">
+                        <Trophy className={`w-24 h-24 mx-auto ${score > questions.length / 2 ? 'text-yellow-400' : 'text-slate-300'}`} />
+                        {score === questions.length && (
+                            <div className="absolute -top-2 -right-2 text-2xl animate-bounce-custom">🌟</div>
+                        )}
+                        </div>
+                        
+                        <div>
+                        <h2 className="text-3xl font-bold text-slate-800 mb-2">Ergebnis</h2>
+                        <p className="text-lg text-slate-500 mb-4 font-medium">{quizSets[activeSetKey].title}</p>
+                        <div className="text-5xl font-black text-emerald-600 mb-4">
+                            {score} / {questions.length}
+                        </div>
+                        <p className="text-xl text-slate-600 font-medium">
+                            {getScoreMessage()}
+                        </p>
+                        </div>
+
+                        <div className="bg-slate-50 p-6 rounded-xl border border-slate-200 text-left">
+                        <h3 className="font-bold text-slate-700 mb-4 border-b pb-2">Zusammenfassung:</h3>
+                        <ul className="space-y-2 text-sm text-slate-600">
+                            {quizSets[activeSetKey].summaryPoints.map((point, i) => (
+                                <li key={i} className="flex items-center gap-2">
+                                    <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                                    <span>{point}</span>
+                                </li>
+                            ))}
+                        </ul>
+                        </div>
+
+                        <button 
+                        onClick={handleRestart}
+                        className="w-full sm:w-auto px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2 mx-auto"
+                        >
+                        <RotateCcw className="w-5 h-5" />
+                        Zurück zum Start
+                        </button>
+                    </div>
+                    )}
+
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<TurtleQuiz />);
+    </script>
+</body>
+</html>
