@@ -370,10 +370,10 @@
 
             const getScoreMessage = () => {
                 const percentage = (score / questions.length) * 100;
-                if (percentage === 100) return "Perfekt! Du bist ein Turtle-Meister! 🐢👑";
-                if (percentage >= 80) return "Super gemacht! 🐢🔥";
-                if (percentage >= 50) return "Gut! Du hast die Grundlagen drauf. 🐢👍";
-                return "Übung macht den Meister. 🐢📚";
+                if (percentage === 100) return "Perfekt! Du bist ein Turtle-Meister! 👑";
+                if (percentage >= 80) return "Super gemacht! 🔥";
+                if (percentage >= 50) return "Gut! Du hast die Grundlagen drauf. 👍";
+                return "Übung macht den Meister. 📚";
             };
 
             const getScoreIcon = () => {
@@ -536,8 +536,8 @@
                         <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-amber-100/60"></div>
                         <div className="relative">
                             <div className="flex items-center justify-between">
-                            <span className="text-xs uppercase tracking-[0.2em] text-emerald-600 font-bold flex items-center gap-2">
-                                Scorecard • <span className="text-[1.2em]">🐍 🐢</span>
+                            <span className="text-xs uppercase tracking-[0.2em] text-emerald-600 font-bold">
+                                <span className="text-xl">🐍🐢</span> Scorecard
                             </span>
                             <span className="inline-flex items-center rounded-full bg-emerald-600 text-white px-3 py-1 text-xs font-semibold shadow-sm">
                                 {quizSets[activeSetKey].title}
@@ -552,7 +552,7 @@
                             
 
                             <div className="mt-10 flex items-end justify-center gap-3">
-                            <div className="text-7xl font-black text-emerald-600 leading-none drop-shadow-[0_8px_24px_rgba(16,185,129,0.35)]">{score}</div>
+                            <div className="text-7xl font-black text-emerald-600 leading-none drop-shadow-[0_10px_28px_rgba(16,185,129,0.55)]">{score}</div>
                             <div className="text-2xl font-bold text-slate-400 leading-none">/ {questions.length}</div>
                             </div>
 
