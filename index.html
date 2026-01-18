@@ -34,6 +34,13 @@
         .animate-bounce-custom {
             animation: bounce-custom 2s infinite;
         }
+        @keyframes turtle-wiggle {
+            0%, 100% { transform: translateX(-2px) rotate(-6deg); }
+            50% { transform: translateX(2px) rotate(6deg); }
+        }
+        .animate-turtle-wiggle {
+            animation: turtle-wiggle 0.8s ease-in-out infinite;
+        }
         @keyframes progress-sheen {
             0% { background-position: 0% 50%; }
             100% { background-position: 200% 50%; }
@@ -383,6 +390,10 @@
                 return "🏆";
             };
 
+            const progressPercent = questions.length
+                ? ((currentQuestion + 1) / questions.length) * 100
+                : 0;
+
             const wrongAnswers = answerHistory
                 .filter((entry) => entry.selectedIndex !== entry.correctIndex)
                 .map((entry) => ({
@@ -441,11 +452,17 @@
                     {gameState === 'quiz' && (
                     <div className="px-6 pb-6 pt-0 sm:px-8 sm:pb-8 sm:pt-0">
                         {/* Progress Bar */}
-                        <div className="bg-slate-100 h-2 mb-8 -mx-6 sm:-mx-8 w-[calc(100%+3rem)] sm:w-[calc(100%+4rem)]">
+                        <div className="bg-slate-100 h-2 mb-8 -mx-6 sm:-mx-8 w-[calc(100%+3rem)] sm:w-[calc(100%+4rem)] relative">
                         <div 
                             className="h-2 transition-all duration-300 animate-progress-sheen"
-                            style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
+                            style={{ width: `${progressPercent}%` }}
                         ></div>
+                        <div
+                            className="absolute -top-5 text-lg animate-turtle-wiggle transition-[left] duration-300"
+                            style={{ left: `calc(${progressPercent}% - 0.5rem)`, paddingTop: "4px" }}
+                        >
+                            🐢
+                        </div>
                         </div>
 
                         <h2 className="text-xl font-bold mb-4">
